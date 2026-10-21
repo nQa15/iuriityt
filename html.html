@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поля — описание и администрирование</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --card: #ffffff;
+    --accent: #2563eb;
+    --accent-dark: #1d4ed8;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+  }
+
+  body {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 60%);
+    min-height: 100vh;
+    color: var(--text);
+    padding: 24px 16px 60px;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; }
+
+  /* ---------- Шапка ---------- */
+  header.top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .logo { display: flex; align-items: center; gap: 12px; }
+
+  .logo .mark {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: grid; place-items: center;
+    color: #fff; font-size: 22px;
+    box-shadow: 0 8px 20px rgba(37,99,235,.35);
+  }
+
+  .logo h1 { font-size: 20px; font-weight: 700; letter-spacing: -.3px; }
+  .logo p  { font-size: 13px; color: var(--muted); }
+
+  nav.tabs { display: flex; gap: 8px; background: #fff; padding: 6px; border-radius: 14px;
+             box-shadow: 0 4px 18px rgba(15,23,42,.07); }
+
+  nav.tabs button {
+    border: 0; background: transparent; cursor: pointer;
+    padding: 10px 18px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; color: var(--muted);
+    transition: .2s;
+  }
+  nav.tabs button:hover { color: var(--accent); }
+  nav.tabs button.active { background: var(--accent); color: #fff; }
+
+  /* ---------- Страницы ---------- */
+  .page { display: none; animation: fade .35s ease; }
+  .page.active { display: block; }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  h2.section-title {
+    font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: -.5px;
+  }
+  p.section-sub { color: var(--muted); margin-bottom: 28px; font-size: 15px; }
+
+  /* ---------- Карточки полей ---------- */
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+
+  .field-card {
+    background: var(--card);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(15,23,42,.08);
+    display: flex; flex-direction: column;
+    transition: transform .25s, box-shadow .25s;
+  }
+  .field-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(15,23,42,.14); }
+
+  .field-card .photo {
+    height: 190px;
+    background: #cbd5e1 center/cover no-repeat;
+    position: relative;
+  }
+
+  .field-card .photo .tag {
+    position: absolute; top: 14px; left: 14px;
+    background: rgba(15,23,42,.72); backdrop-filter: blur(6px);
+    color: #fff; font-size: 12px; font-weight: 600;
+    padding: 6px 12px; border-radius: 999px; letter-spacing: .3px;
+  }
+
+  .field-card .body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+  .field-card h3 { font-size: 19px; margin-bottom: 10px; }
+  .field-card .desc { color: var(--muted); font-size: 14.5px; line-height: 1.65; white-space: pre-line; flex: 1; }
+
+  /* ---------- Вход ---------- */
+  .login-box {
+    max-width: 420px; margin: 40px auto;
+    background: #fff; padding: 34px;
+    border-radius: 22px;
+    box-shadow: 0 16px 40px rgba(15,23,42,.1);
+    text-align: center;
+  }
+  .login-box .icon {
+    width: 62px; height: 62px; margin: 0 auto 18px;
+    border-radius: 18px; display: grid; place-items: center;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff; font-size: 28px;
+  }
+  .login-box h3 { font-size: 20px; margin-bottom: 8px; }
+  .login-box p  { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+
+  input[type="password"], input[type="text"], textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--border); border-radius: 12px;
+    font-size: 14.5px; font-family: inherit; color: var(--text);
+    background: #f8fafc; transition: .2s; outline: none;
+  }
+  input:focus, textarea:focus { border-color: var(--accent); background: #fff;
+                                box-shadow: 0 0 0 4px rgba(37,99,235,.12); }
+
+  textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+
+  .btn {
+    border: 0; cursor: pointer; font-family: inherit;
+    font-size: 14.5px; font-weight: 600;
+    padding: 12px 22px; border-radius: 12px;
+    transition: .2s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(37,99,235,.3); }
+  .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-ghost { background: #f1f5f9; color: var(--text); }
+  .btn-ghost:hover { background: #e2e8f0; }
+  .btn-danger { background: #fee2e2; color: #b91c1c; }
+  .btn-danger:hover { background: #fecaca; }
+  .btn-block { width: 100%; justify-content: center; }
+
+  .error-msg { color: #dc2626; font-size: 13.5px; margin-top: 12px; min-height: 18px; }
+
+  /* ---------- Админ-панель ---------- */
+  .admin-head {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 14px; margin-bottom: 26px;
+  }
+
+  .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; }
+
+  .admin-card {
+    background: #fff; border-radius: 20px; padding: 22px;
+    box-shadow: 0 10px 30px rgba(15,23,42,.07);
+    border: 1.5px solid var(--border);
+  }
+  .admin-card h3 { font-size: 17px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .admin-card h3 .num {
+    width: 28px; height: 28px; border-radius: 9px; flex: 0 0 auto;
+    background: #eef2ff; color: var(--accent);
+    display: grid; place-items: center; font-size: 13px; font-weight: 700;
+  }
+
+  .admin-card label { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted);
+                      text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 7px; }
+  .admin-card label:first-of-type { margin-top: 0; }
+
+  .preview {
+    height: 130px; border-radius: 14px; margin-bottom: 4px;
+    background: #f1f5f9 center/cover no-repeat;
+    border: 1.5px dashed #cbd5e1;
+    display: grid; place-items: center; color: var(--muted); font-size: 13px;
+  }
+  .preview.has-img { border-style: solid; border-color: var(--border); }
+
+  .file-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+  input[type="file"] { display: none; }
+
+  .toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #16a34a; color: #fff; padding: 13px 26px; border-radius: 12px;
+    font-size: 14.5px; font-weight: 600; box-shadow: 0 10px 30px rgba(22,163,74,.4);
+    opacity: 0; transition: .35s; pointer-events: none; z-index: 99;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .hint { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= ШАПКА ================= -->
+  <header class="top">
+    <div class="logo">
+      <div class="mark">🌾</div>
+      <div>
+        <h1>Квартирыя</h1>
+        <p>Прошу Вас в гости</p>
+      </div>
+    </div>
+
+    <nav class="tabs">
+      <button id="tab1" class="active" onclick="showPage(1)">Описание квартир</button>
+      <button id="tab2" onclick="showPage(2)">Администрирование</button>
+    </nav>
+  </header>
+
+  <!-- ============ СТРАНИЦА 1: ОПИСАНИЕ ПОЛЕЙ ============ -->
+  <section id="page1" class="page active">
+    <h2 class="section-title">квартиры</h2>
+    <p class="section-sub">описание</p>
+
+    <div class="fields" id="fieldsContainer">
+      <!-- карточки генерируются скриптом -->
+    </div>
+  </section>
+
+  <!-- ============ СТРАНИЦА 2: АДМИНИСТРИРОВАНИЕ ============ -->
+  <section id="page2" class="page">
+
+    <!-- Форма входа -->
+    <div id="loginBox" class="login-box">
+      <div class="icon">🔒</div>
+      <h3>Вход в администрирование</h3>
+      <p>Введите пароль администратора, чтобы редактировать поля</p>
+
+      <input type="password" id="pwdInput" placeholder="Пароль"
+             onkeydown="if(event.key==='Enter') doLogin()">
+      <div class="error-msg" id="loginError"></div>
+
+      <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="doLogin()">
+        Войти
+      </button>
+      <p class="hint" style="margin-top:14px"><b></b></p>
+    </div>
+
+    <!-- Панель редактирования -->
+    <div id="adminPanel" style="display:none">
+      <div class="admin-head">
+        <div>
+          <h2 class="section-title" style="font-size:22px">Настройки полей</h2>
+          <p class="section-sub" style="margin:0">Изменение фотографии и описания каждого поля</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="resetAll()">↺ Сбросить всё</button>
+          <button class="btn btn-danger" onclick="doLogout()">Выйти</button>
+        </div>
+      </div>
+
+      <div class="admin-grid" id="adminGrid">
+        <!-- карточки редактирования генерируются скриптом -->
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast">Сохранено</div>
+
+<script>
+/* =========================================================
+   ДАННЫЕ
+   ========================================================= */
+const ADMIN_PASSWORD = "1962";
+const STORAGE_KEY = "fields_data_v1";
+
+/* SVG-заглушки вместо фотографий (работают без интернета) */
+function placeholder(color1, color2, label) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${color1}"/>
+      <stop offset="100%" stop-color="${color2}"/>
+    </linearGradient></defs>
+    <rect width="800" height="500" fill="url(#g)"/>
+    <text x="400" y="265" font-family="Segoe UI, Arial" font-size="46" font-weight="bold"
+          fill="rgba(255,255,255,.85)" text-anchor="middle">${label}</text>
+  </svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+const DEFAULT_DATA = [
+  {
+    id: 1,
+    tag: "Поле №1",
+    title: "Северное поле",
+    desc: "Площадь: 42 га.\nКультура: озимая пшеница.\nТип почвы: чернозём типичный.\nПоследняя обработка: вспашка и внесение удобрений.",
+    photo: placeholder("#65a30d", "#a3e635", "Поле №1")
+  },
+  {
+    id: 2,
+    tag: "Поле №2",
+    title: "Заречное поле",
+    desc: "Площадь: 35 га.\nКультура: кукуруза на зерно.\nТип почвы: чернозём выщелоченный.\nПолив: капельное орошение.",
+    photo: placeholder("#ca8a04", "#facc15", "Поле №2")
+  },
+  {
+    id: 3,
+    tag: "Поле №3",
+    title: "Южное поле",
+    desc: "Площадь: 28 га.\nКультура: подсолнечник.\nТип почвы: тёмно-каштановая.\nОсобенности: склон, требуется противоэрозионная обработка.",
+    photo: placeholder("#0d9488", "#5eead4", "Поле №3")
+  }
+];
+
+/* =========================================================
+   ХРАНИЛИЩЕ
+   ========================================================= */
+let fields = loadData();
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length === 3) return parsed;
+    }
+  } catch (e) { /* ignore */ }
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fields)); } catch (e) {}
+}
+
+/* =========================================================
+   НАВИГАЦИЯ
+   ========================================================= */
+function showPage(n) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll("nav.tabs button").forEach(b => b.classList.remove("active"));
+  document.getElementById("page" + n).classList.add("active");
+  document.getElementById("tab" + n).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* =========================================================
+   СТРАНИЦА 1 — РЕНДЕР КАРТОЧЕК
+   ========================================================= */
+function renderPublic() {
+  const box = document.getElementById("fieldsContainer");
+  box.innerHTML = "";
+
+  fields.forEach((f, i) => {
+    const card = document.createElement("article");
+    card.className = "field-card";
+    card.innerHTML = `
+      <div class="photo" style="background-image:url('${f.photo}')">
+        <span class="tag">${escapeHtml(f.tag)}</span>
+      </div>
+      <div class="body">
+        <h3>${escapeHtml(f.title)}</h3>
+        <div class="desc">${escapeHtml(f.desc)}</div>
+      </div>`;
+    card.style.animation = `fade .4s ease ${i * 0.08}s both`;
+    box.appendChild(card);
+  });
+}
+
+/* =========================================================
+   СТРАНИЦА 2 — АДМИНКА
+   ========================================================= */
+function renderAdmin() {
+  const grid = document.getElementById("adminGrid");
+  grid.innerHTML = "";
+
+  fields.forEach((f, idx) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+    card.innerHTML = `
+      <h3><span class="num">${idx + 1}</span> ${escapeHtml(f.title)}</h3>
+
+      <label>Фотография</label>
+      <div class="preview ${f.photo ? 'has-img' : ''}" id="prev${idx}"
+           style="${f.photo ? `background-image:url('${f.photo}')` : ''}">
+        ${f.photo ? "" : "Нет изображения"}
+      </div>
+      <div class="file-row">
+        <input type="file" accept="image/*" id="file${idx}"
+               onchange="handleFile(event, ${idx})">
+        <button class="btn btn-ghost" onclick="document.getElementById('file${idx}').click()">
+          📷 Загрузить фото
+        </button>
+        <button class="btn btn-danger" onclick="removePhoto(${idx})">Удалить</button>
+      </div>
+
+      <label>Название поля</label>
+      <input type="text" id="title${idx}" value="${escapeAttr(f.title)}"
+             oninput="updateField(${idx}, 'title', this.value)">
+
+      <label>Описание</label>
+      <textarea id="desc${idx}"
+                oninput="updateField(${idx}, 'desc', this.value)">${escapeHtml(f.desc)}</textarea>
+
+      <div class="hint">Изменения сохраняются автоматически</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* --- Обновление текстовых полей --- */
+function updateField(idx, key, value) {
+  fields[idx][key] = value;
+  saveData();
+  renderPublic();
+}
+
+/* --- Загрузка фото --- */
+function handleFile(event, idx) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showToast("Выберите файл изображения", true);
+    return;
+  }
+  if (file.size > 3 * 1024 * 1024) {
+    showToast("Файл больше 3 МБ", true);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    fields[idx].photo = e.target.result;
+    saveData();
+
+    const prev = document.getElementById("prev" + idx);
+    prev.style.backgroundImage = `url('${fields[idx].photo}')`;
+    prev.classList.add("has-img");
+    prev.textContent = "";
+
+    renderPublic();
+    showToast("Фото обновлено");
+  };
+  reader.readAsDataURL(file);
+}
+
+/* --- Удаление фото --- */
+function removePhoto(idx) {
+  fields[idx].photo = "";
+  saveData();
+
+  const prev = document.getElementById("prev" + idx);
+  prev.style.backgroundImage = "";
+  prev.classList.remove("has-img");
+  prev.textContent = "Нет изображения";
+
+  const input = document.getElementById("file" + idx);
+  if (input) input.value = "";
+
+  renderPublic();
+  showToast("Фото удалено");
+}
+
+/* =========================================================
+   АВТОРИЗАЦИЯ
+   ========================================================= */
+function doLogin() {
+  const input = document.getElementById("pwdInput");
+  const err = document.getElementById("loginError");
+
+  if (input.value === ADMIN_PASSWORD) {
+    err.textContent = "";
+    input.value = "";
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    renderAdmin();
+    showToast("Добро пожаловать!");
+  } else {
+    err.textContent = "Неверный пароль. Попробуйте снова.";
+    input.value = "";
+    input.focus();
+  }
+}
+
+function doLogout() {
+  document.getElementById("adminPanel").style.display = "none";
+  document.getElementById("loginBox").style.display = "block";
+  document.getElementById("loginError").textContent = "";
+  showToast("Вы вышли из панели");
+}
+
+/* =========================================================
+   СБРОС
+   ========================================================= */
+function resetAll() {
+  if (!confirm("Сбросить все фотографии и описания к исходным?")) return;
+  fields = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  saveData();
+  renderPublic();
+  renderAdmin();
+  showToast("Данные сброшены");
+}
+
+/* =========================================================
+   УТИЛИТЫ
+   ========================================================= */
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function escapeAttr(str) { return escapeHtml(str).replace(/\n/g, " "); }
+
+let toastTimer;
+function showToast(msg, isError = false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.background = isError ? "#dc2626" : "#16a34a";
+  t.style.boxShadow = isError
+    ? "0 10px 30px rgba(220,38,38,.4)"
+    : "0 10px 30px rgba(22,163,74,.4)";
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* =========================================================
+   СТАРТ
+   ========================================================= */
+renderPublic();
+</script>
+</body>
+</html>
