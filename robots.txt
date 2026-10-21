@@ -1,1 +1,4 @@
+User-agent: *
+Allow: /
 
+Sitemap: https://nQa15.github.io/iuriityt/sitemap.xml
