@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nqa15.github.io/iuriityt/sitemap.xml
+Sitemap: https://nQa15.github.io/iuriityt/sitemap.xml
